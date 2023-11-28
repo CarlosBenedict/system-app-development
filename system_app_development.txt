@@ -1,0 +1,78 @@
+namespace system_app_development
+{
+    public partial class Form1 : Form
+    {
+        //Store the Variables for both Fahrenheit and Celcius
+        int TempFah, TempCel;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void vScrollBar1TEMP_Scroll(object sender, ScrollEventArgs e)
+        {
+            TempFah = vScrollBar1TEMP.Value;
+            textBoxTempFah.Text = TempFah.ToString();
+            TempCel = Convert.ToInt32((TempFah - 32) * 5 / 9);
+
+            textBoxTempCel.Text = TempCel.ToString();
+
+            // Trigger the Paint event to redraw the scales
+            vScrollBar1TEMP.Invalidate();
+
+        }
+
+        private void textBoxTempFah_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(textBoxTempFah.Text, out TempFah))
+            {
+                TempCel = Convert.ToInt32((TempFah - 32) * 5 / 9);
+                textBoxTempCel.Text = TempCel.ToString();
+            }
+            else
+            {
+                // Handle invalid input
+                textBoxTempCel.Text = "Invalid input";
+            }
+        }
+        private void pictureBoxScales_Paint(object sender, PaintEventArgs e)
+        {
+            // Draw Celsius scale on the left side
+            for (int celsius = -20; celsius <= 40; celsius += 10)
+            {
+                int y = ScaleToPixel(celsius, vScrollBar1TEMP.Height);
+                e.Graphics.DrawString($"{celsius}°C", Font, Brushes.Black, 5, y);
+            }
+
+            // Draw Fahrenheit scale on the right side
+            for (int fahrenheit = -4; fahrenheit <= 104; fahrenheit += 20)
+            {
+                int y = ScaleToPixel(fahrenheit, vScrollBar1TEMP.Height);
+                e.Graphics.DrawString($"{fahrenheit}°F", Font, Brushes.Black, vScrollBar1TEMP.Width - 50, y);
+            }
+        }
+
+        private int ScaleToPixel(int temperature, int pictureBoxHeight)
+        {
+            // Scale temperature values to pixels on the picture box
+            int minTemp = -20;
+            int maxTemp = 104;
+            return (int)((pictureBoxHeight - 1) * (temperature - minTemp) / (maxTemp - minTemp));
+        }
+
+        private void textBoxTempCel_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(textBoxTempCel.Text, out TempCel))
+            {
+                TempFah = Convert.ToInt32(TempCel * 9 / 5 + 32);
+                textBoxTempFah.Text = TempFah.ToString();
+            }
+            else
+            {
+                // Handle invalid input
+                textBoxTempFah.Text = "Invalid input";
+            }
+
+        }
+    }
+}
